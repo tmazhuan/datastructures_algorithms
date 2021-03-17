@@ -1,0 +1,1 @@
+C:\Users\thoma\Programming\Rust\datastructures_algorithms\target\debug\tester.exe: C:\Users\thoma\Programming\Rust\datastructures_algorithms\lifo\src\lib.rs C:\Users\thoma\Programming\Rust\datastructures_algorithms\tester\src\main.rs
