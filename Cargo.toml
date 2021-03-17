@@ -3,4 +3,5 @@
 members = [
     "tester",
     "fifo",
+    "lifo"
 ]
