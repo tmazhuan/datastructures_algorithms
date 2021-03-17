@@ -1,5 +1,5 @@
 [package]
-name = "lifo"
+name = "fifo"
 version = "0.1.0"
 authors = ["tmazhuan <thomas.mazhuancherry@gmail.com>"]
 edition = "2018"

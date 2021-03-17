@@ -1,5 +1,3 @@
-use lifo;
+use fifo;
 
-fn main() {
-    lifo::print();
-}
+fn main() {}
