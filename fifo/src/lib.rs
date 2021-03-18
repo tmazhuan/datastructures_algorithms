@@ -1,7 +1,6 @@
 pub mod fifo {
     //! This module implements a FIFO queue with enqueue and dequeue functionality.
-    //! The items stored in the list need to implement the Copy Trait.
-    //! For a future iteration i will try to remove this restriction.
+    //!
     //!
 
     use std::cell::RefCell;
@@ -52,10 +51,7 @@ pub mod fifo {
         ///attaches a new Node to the end of its queue and returns its new length
         /// # Attributes
         /// * `value`- the value to append
-        pub fn enqueue(&mut self, value: T) -> i32
-        where
-            T: Copy,
-        {
+        pub fn enqueue(&mut self, value: T) -> i32 {
             let new_node = Node::new(value);
             //lets take the tail and match it to see if we enter the first item
             match self.tail.take() {
@@ -81,10 +77,7 @@ pub mod fifo {
         }
 
         ///Removes and returns the first item in the list
-        pub fn dequeue(&mut self) -> Option<T>
-        where
-            T: Copy,
-        {
+        pub fn dequeue(&mut self) -> Option<T> {
             match self.head.take() {
                 Some(head) => {
                     //what is the next element in the list
@@ -94,7 +87,10 @@ pub mod fifo {
                         None => self.tail = None,
                     };
                     self.length -= 1;
-                    Some(head.borrow().value)
+                    match Rc::try_unwrap(head) {
+                        Ok(i) => Some(i.into_inner().value),
+                        Err(_) => panic!("Something is wrong. We shouldn't arrive here!!!"),
+                    }
                 }
                 None => None,
             }
@@ -114,9 +110,9 @@ mod tests {
     #[test]
     fn test_one_item_lifo() {
         let mut l = Fifo::new();
-        assert_eq!(1, l.enqueue("test"));
+        assert_eq!(1, l.enqueue(String::from("test")));
         assert_eq!(l.get_length(), 1);
-        assert_eq!("test", l.dequeue().unwrap());
+        assert_eq!(String::from("test"), l.dequeue().unwrap());
         assert_eq!(l.get_length(), 0);
     }
 
