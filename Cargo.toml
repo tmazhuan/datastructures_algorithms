@@ -3,5 +3,6 @@
 members = [
     "tester",
     "fifo",
-    "lifo"
+    "lifo",
+    "lists",
 ]

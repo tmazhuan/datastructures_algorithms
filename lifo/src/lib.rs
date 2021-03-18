@@ -55,7 +55,6 @@ pub mod lifo {
             //lets take the tail and match it to see if we enter the first item
             match self.tail.take() {
                 Some(old_tail) => {
-                    //we need to change the value so we borrow it mutables and set the next value to the new node
                     let new_tail_ref = Rc::new(RefCell::new(new_node));
                     let previous_node_ref = Rc::clone(&old_tail);
                     new_tail_ref.borrow_mut().previous = Some(previous_node_ref);

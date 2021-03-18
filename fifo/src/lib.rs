@@ -1,6 +1,6 @@
 pub mod fifo {
     //! This module implements a FIFO queue with enqueue and dequeue functionality.
-    //! For long queues we should implement the Drop function to ensure successful disposal of the queue.
+    //! For long queues we should implement the Drop function to ensure successful disposal of the queue.   
 
     use std::cell::RefCell;
     use std::rc::Rc;
@@ -55,7 +55,6 @@ pub mod fifo {
             //lets take the tail and match it to see if we enter the first item
             match self.tail.take() {
                 Some(old_tail) => {
-                    //we need to change the value so we borrow it mutables and set the next value to the new node
                     let new_tail_ref = Rc::new(RefCell::new(new_node));
                     let next_node_ref = Rc::clone(&new_tail_ref);
                     old_tail.borrow_mut().next = Some(next_node_ref);
