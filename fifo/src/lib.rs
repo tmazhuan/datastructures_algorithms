@@ -1,14 +1,22 @@
 pub mod fifo {
+    //! This module implements a FIFO queue with enqueue and dequeue functionality.
+    //! The items stored in the list need to implement the Copy Trait.
+    //! For a future iteration i will try to remove this restriction.
+    //!
 
     use std::cell::RefCell;
     use std::rc::Rc;
 
+    ///Type to simplify variable declaration
     type Link<T> = Option<Rc<RefCell<Node<T>>>>;
+
+    ///A single node in the queue with a value and a pointer to another node.
     struct Node<T> {
         value: T,
         next: Link<T>,
     }
 
+    ///The FIFO queue with a pointer to its head and tail
     pub struct Fifo<T> {
         head: Link<T>,
         tail: Link<T>,
@@ -16,6 +24,9 @@ pub mod fifo {
     }
 
     impl<T> Node<T> {
+        ///Returns a new Node with the value `value`
+        /// # Attributes
+        /// * `value`- the value to assign to the node
         pub fn new(value: T) -> Node<T> {
             Node {
                 value: value,
@@ -25,6 +36,7 @@ pub mod fifo {
     }
 
     impl<T> Fifo<T> {
+        ///Returns a new empty FIFO queue
         pub fn new() -> Fifo<T> {
             Fifo {
                 head: None,
@@ -32,10 +44,14 @@ pub mod fifo {
                 length: 0,
             }
         }
+        ///Returns the length of its queue
         pub fn get_length(&self) -> i32 {
             self.length
         }
 
+        ///attaches a new Node to the end of its queue and returns its new length
+        /// # Attributes
+        /// * `value`- the value to append
         pub fn enqueue(&mut self, value: T) -> i32
         where
             T: Copy,
@@ -64,6 +80,7 @@ pub mod fifo {
             self.length
         }
 
+        ///Removes and returns the first item in the list
         pub fn dequeue(&mut self) -> Option<T>
         where
             T: Copy,
