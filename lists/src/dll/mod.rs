@@ -88,7 +88,17 @@ impl<T> DlList<T> {
                 //what is the next element in the list
                 let next = head.borrow_mut().next.take();
                 match next {
-                    Some(next) => self.head = Some(next),
+                    Some(next) => {
+                        //we need to set the prevoius point to None as it is the head now
+                        next.borrow_mut().previous = None;
+                        //We need to check if current_position is pointing to our taken head
+                        if Rc::ptr_eq(&self.current_position.as_ref().unwrap(), &head) {
+                            //if it is we move the curren_position to our new head
+                            self.current_position = Some(Rc::clone(&next));
+                        }
+                        //and we set the head
+                        self.head = Some(next);
+                    }
                     None => {
                         //no item in the list anymore
                         self.tail = None;
@@ -112,7 +122,16 @@ impl<T> DlList<T> {
                 //what is the next element in the list
                 let previous = tail.borrow_mut().previous.take();
                 match previous {
-                    Some(previous) => self.tail = Some(previous),
+                    Some(previous) => {
+                        //we need to set the next point to None as it is the tail now
+                        previous.borrow_mut().next = None;
+                        //We need to check if current_position is pointing to our taken tail
+                        if Rc::ptr_eq(&self.current_position.as_ref().unwrap(), &tail) {
+                            //if it is we move the curren_position to our new tail
+                            self.current_position = Some(Rc::clone(&previous));
+                        }
+                        self.tail = Some(previous);
+                    }
                     None => {
                         //no item in the list anymore
                         self.head = None;
@@ -165,6 +184,55 @@ mod tests {
         assert_eq!(l.get_length(), 1);
         assert_eq!(String::from("test"), l.get_tail().unwrap());
         assert_eq!(l.get_length(), 0);
+    }
+
+    #[test]
+    fn test_multi_item_dll_head() {
+        let mut l = DlList::new();
+        assert_eq!(1, l.enqueue(String::from("test1")));
+        assert_eq!(2, l.enqueue(String::from("test2")));
+        assert_eq!(2, l.get_length());
+        assert_eq!(String::from("test1"), l.get_head().unwrap());
+        assert_eq!(l.get_length(), 1);
+        assert_eq!(String::from("test2"), l.get_head().unwrap());
+        assert_eq!(l.get_length(), 0);
+        assert!(l.get_head().is_none());
+    }
+
+    #[test]
+    fn test_multi_item_dll_tail() {
+        let mut l = DlList::new();
+        assert_eq!(1, l.enqueue(String::from("test1")));
+        assert_eq!(2, l.enqueue(String::from("test2")));
+        assert_eq!(2, l.get_length());
+        assert_eq!(String::from("test2"), l.get_tail().unwrap());
+        assert_eq!(l.get_length(), 1);
+        assert_eq!(String::from("test1"), l.get_tail().unwrap());
+        assert_eq!(l.get_length(), 0);
+        assert!(l.get_tail().is_none());
+    }
+    #[test]
+    fn test_multi_item_dll_mixed() {
+        let mut l = DlList::new();
+        assert_eq!(1, l.enqueue(String::from("test1"))); //
+        assert_eq!(2, l.enqueue(String::from("test2"))); //
+        assert_eq!(3, l.enqueue(String::from("test3")));
+        assert_eq!(4, l.enqueue(String::from("test4")));
+        assert_eq!(5, l.enqueue(String::from("test5"))); //
+        assert_eq!(5, l.get_length());
+        assert_eq!(String::from("test5"), l.get_tail().unwrap());
+        assert_eq!(l.get_length(), 4);
+        assert_eq!(String::from("test1"), l.get_head().unwrap());
+        assert_eq!(l.get_length(), 3);
+        assert_eq!(4, l.enqueue(String::from("test6"))); //
+        assert_eq!(l.get_length(), 4);
+        assert_eq!(String::from("test2"), l.get_head().unwrap());
+        assert_eq!(String::from("test6"), l.get_tail().unwrap());
+        assert_eq!(String::from("test4"), l.get_tail().unwrap());
+        assert_eq!(String::from("test3"), l.get_head().unwrap());
+        assert!(l.get_head().is_none());
+        assert!(l.get_tail().is_none());
+        assert_eq!(0, l.get_length());
     }
 
     // #[test]
