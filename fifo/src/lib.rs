@@ -1,7 +1,6 @@
 pub mod fifo {
     //! This module implements a FIFO queue with enqueue and dequeue functionality.
-    //!
-    //!
+    //! For long queues we should implement the Drop function to ensure successful disposal of the queue.
 
     use std::cell::RefCell;
     use std::rc::Rc;
