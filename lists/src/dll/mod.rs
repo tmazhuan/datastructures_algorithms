@@ -1,14 +1,14 @@
 //! This module implements a double linked list with enqueue, a consuming get_head, a consuming get_tail,
-//! and non consuming move_forward, move_backward
+//! and non consuming peek
 //! For long queues we should implement the Drop function to ensure successful disposal of the queue.   
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
 ///Type to simplify variable declaration
 type Link<T> = Option<Rc<RefCell<Node<T>>>>;
 
 ///A single node in the queue with a value and a pointer to another node.
-struct Node<T> {
+pub struct Node<T> {
     value: T,
     next: Link<T>,
     previous: Link<T>,
@@ -115,6 +115,26 @@ impl<T> DlList<T> {
         }
     }
 
+    pub fn move_forward(&mut self) -> bool {
+        let cp: Link<T>;
+        if self.length == 0 {
+            return false;
+        } else {
+            let n = self.current_position.as_ref().unwrap().borrow();
+            if n.next.is_none() {
+                return false;
+            } else {
+                let mut next = Some(Ref::map(n, |node| node.next.as_ref().unwrap()));
+                cp = match next.take() {
+                    Some(x) => Some(Rc::clone(&*x)),
+                    None => return false,
+                };
+            }
+        }
+        self.current_position = cp;
+        return true;
+    }
+
     ///Removes and returns the tail item in the list
     pub fn get_tail(&mut self) -> Option<T> {
         match self.tail.take() {
@@ -146,6 +166,24 @@ impl<T> DlList<T> {
             }
             None => None,
         }
+    }
+
+    pub fn peek_current_position(&self) -> Option<Ref<T>> {
+        self.current_position
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.value))
+    }
+
+    pub fn peek_front(&self) -> Option<Ref<T>> {
+        self.head
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.value))
+    }
+
+    pub fn peek_back(&self) -> Option<Ref<T>> {
+        self.tail
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.value))
     }
 }
 
@@ -235,20 +273,17 @@ mod tests {
         assert_eq!(0, l.get_length());
     }
 
-    // #[test]
-    // fn test_multi_item_lifo() {
-    //     let mut l = DlList::new();
-    //     assert_eq!(1, l.enqueue(1));
-    //     assert_eq!(2, l.enqueue(2));
-    //     assert_eq!(3, l.enqueue(3));
-    //     assert_eq!(4, l.enqueue(4));
-    //     assert_eq!(5, l.enqueue(5));
-    //     let i = 5;
-    //     assert_eq!(l.get_length(), i);
-    //     assert_eq!(5, l.get_tail().unwrap());
-    //     assert_eq!(l.get_length(), i - 1);
-    //     //assert_eq!(1, l.get_head().unwrap());
-    //     // assert!(l.head.is_none());
-    //     assert_eq!(l.get_length(), i - 2);
-    // }
+    #[test]
+    fn test_peek() {
+        let mut l = DlList::new();
+        assert_eq!(1, l.enqueue(String::from("test1")));
+        assert_eq!(2, l.enqueue(String::from("test2")));
+        assert_eq!(String::from("test1"), *l.peek_front().unwrap());
+        assert_eq!(String::from("test2"), *l.peek_back().unwrap());
+        assert_eq!(String::from("test1"), *l.peek_current_position().unwrap());
+        assert_eq!(String::from("test1"), *l.peek_current_position().unwrap());
+        assert!(l.move_forward());
+        assert_eq!(String::from("test2"), *l.peek_current_position().unwrap());
+        assert!(!l.move_forward());
+    }
 }

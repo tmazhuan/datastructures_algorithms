@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 fifo = { path = "../fifo" }
+lists = { path = "../lists" }

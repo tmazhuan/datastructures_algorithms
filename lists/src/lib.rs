@@ -1,3 +1,3 @@
 pub mod dll;
 
-mod lists {}
+pub mod lists {}
