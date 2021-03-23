@@ -1,21 +1,22 @@
 use lists::dll::*;
 fn main() {
-    let mut dlist = DlList::new();
-    for i in 0..1000 {
-        dlist.enqueue(i);
+    let mut l = DlList::new();
+    for i in 1..6 {
+        // println!("{}", i);
+        assert_eq!(i, l.enqueue(i));
     }
-    let mut has_next_to_peek = dlist.get_length() > 0;
-    while has_next_to_peek {
-        println!("Peeking: {}", *dlist.peek_current_position().unwrap());
-        has_next_to_peek = dlist.move_forward();
-    }
-
-    while let Some(x) = dlist.get_tail() {
-        println!("getting: {}", x);
-    }
-    let mut has_next_to_peek = dlist.get_length() > 0;
-    while has_next_to_peek {
-        println!("Peeking: {}", *dlist.peek_current_position().unwrap());
-        has_next_to_peek = dlist.move_forward();
-    }
+    //current position should be the head
+    //assert_eq!(1, l.get_current_position().unwrap());
+    while l.move_forward() {}
+    // while l.move_backward() {}
+    //we should be at the tail now
+    //lets move one backwards
+    // l.move_backward();
+    assert_eq!(5, l.get_current_position().unwrap());
+    assert_eq!(4, l.get_tail().unwrap());
+    assert_eq!(1, l.get_head().unwrap());
+    while l.move_backward() {}
+    assert_eq!(2, l.get_current_position().unwrap());
+    assert_eq!(3, l.get_current_position().unwrap());
+    assert!(l.get_current_position().is_none());
 }
